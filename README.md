@@ -4,7 +4,7 @@
 
 A full customer intelligence project built from raw transactional data — with no loyalty score, no churn label, and no timestamps provided. Every metric, segment, and recommendation in this project is engineered and traced back to specific variables, not assumed.
 
-📊 **[View the Founder Dashboard (PDF)](dashboard/founder_dashboard.pdf)** · 📄 **[Read the Executive Summary](playbook/executive_summary.md)**
+📊 **[View the Founder Dashboard (PDF)](founder_dashboard.pdf)** · 📄 **[Read the Executive Summary](executive_summary.md)**
 
 > **The strategic question:** Is the business building a loyal customer base, or renting revenue with discounts — and what should it do under either scenario?
 >
