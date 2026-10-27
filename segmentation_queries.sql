@@ -150,6 +150,18 @@ SELECT
 FROM customers
 GROUP BY discount_applied;
 
+-- 4c. Robustness: only men were ever discounted (0 of 1,248 women), so 4a mixes a discount
+--     effect with a gender effect. Re-run like-for-like within men — the "no lift" result holds.
+SELECT
+    discount_applied,
+    COUNT(*)                          AS male_customers,
+    ROUND(AVG(purchase_amount),2)     AS avg_spend,
+    ROUND(AVG(previous_purchases),1)  AS avg_prev_purchases,
+    ROUND(AVG(review_rating),2)       AS avg_rating
+FROM customers
+WHERE gender = 'Male'
+GROUP BY discount_applied;
+
 -- 4b. Promo-sunset targeting: rank dependency tiers by value at stake & margin upside.
 --     High-value Subscription-Promo customers = safest to wean (they already commit).
 SELECT
@@ -180,12 +192,25 @@ FROM customers
 WHERE ideal_customer = 1;
 
 -- 5b. Ideal customer's signature: top category, season, payment, gender mix.
+--     Caveat: the female skew here is an artefact — no woman was ever discounted, so all
+--     women pass loyal_b's full-price filter. See 5c before reading gender as a signal.
 SELECT 'category' AS attribute, category AS value, COUNT(*) AS n
     FROM customers WHERE ideal_customer=1 GROUP BY category
 UNION ALL SELECT 'season', season, COUNT(*) FROM customers WHERE ideal_customer=1 GROUP BY season
 UNION ALL SELECT 'payment', payment_method, COUNT(*) FROM customers WHERE ideal_customer=1 GROUP BY payment_method
 UNION ALL SELECT 'gender', gender, COUNT(*) FROM customers WHERE ideal_customer=1 GROUP BY gender
 ORDER BY attribute, n DESC;
+
+-- 5c. Controlling for the confound: ideal rate among FULL-PRICE customers only, by gender.
+--     Men are slightly MORE likely to be ideal — target on behaviour, not gender.
+SELECT
+    gender,
+    COUNT(*)                                AS full_price_customers,
+    SUM(ideal_customer)                     AS ideal_customers,
+    ROUND(100*AVG(ideal_customer),1)        AS pct_ideal
+FROM customers
+WHERE disc = 0
+GROUP BY gender;
 
 
 -- =====================================================================
